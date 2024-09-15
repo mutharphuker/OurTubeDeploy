@@ -37,9 +37,9 @@ def send_message(message):
 			bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][3])
 			bot.send_video(message.chat.id, video=open(path, "rb"), supports_streaming=True)
 			os.remove(path)
-	except exceptions.AgeRestrictedError:
+	except Exception.AgeRestrictedError:
 		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][4])
-	except exceptions.RegexMatchError:
+	except Exception.RegexMatchError:
 		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][6])
 	except Exception as e:
 		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][5])
