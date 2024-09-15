@@ -43,7 +43,8 @@ def send_message(message):
 		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][6])
 	except Exception as e:
 		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][5])
-		print("ERROR: " + e)
+		print("ERROR should be below:")
+		print(repr(e))
 		
 print("Bot is running...")
 bot.polling(none_stop=True)
