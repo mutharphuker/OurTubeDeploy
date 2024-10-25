@@ -43,7 +43,7 @@ def send_message(message):
 			bot.send_video(message.chat.id, video, caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
 
 		os.remove(file_path)
-		bot.edit_message_text(lng[f'{message.from_user.language_code}'][9], chat_id=message.chat.id, message_id=statuss.message_id)
+		bot.delete_message(message.chat.id, statuss.message_id)
 		# yt = YouTube(link, use_oauth=True, allow_oauth_cache=True)
 		# ys = yt.streams.get_highest_resolution()
 		# if ys.filesize >= 50000000:
