@@ -27,7 +27,7 @@ def helpme(message):
 def send_message(message):
 	link = message.text
 	try:
-		status = bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
+		statuss = bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
 		ydl_opts = {
 			'format': bestvideo[height<=1080]+bestaudio/best[height<=1080],
 			'outtmpl': '%(title)s.%(ext)s',
@@ -37,13 +37,13 @@ def send_message(message):
 			video_title = info_dict.get('title', 'video')
 			file_path = f"{video_title}.mp4"
 			
-		bot.edit_message_text(chat_id=message.chat.id, message_id=status.message_id, text=lng[f'{message.from_user.language_code}'][3])
+		bot.edit_message_text(lng[f'{message.from_user.language_code}'][3], chat_id=message.chat.id, message_id=statuss.message_id)
 		# Send the video file to the user
 		with open(file_path, 'rb') as video:
 			bot.send_video(message.chat.id, video, caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
 
 		os.remove(file_path)
-		bot.edit_message_text(chat_id=message.chat.id, message_id=status.message_id, text=lng[f'{message.from_user.language_code}'][9])
+		bot.edit_message_text(lng[f'{message.from_user.language_code}'][9], chat_id=message.chat.id, message_id=statuss.message_id)
 		# yt = YouTube(link, use_oauth=True, allow_oauth_cache=True)
 		# ys = yt.streams.get_highest_resolution()
 		# if ys.filesize >= 50000000:
