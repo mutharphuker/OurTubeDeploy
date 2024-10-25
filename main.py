@@ -29,6 +29,7 @@ def helpme(message):
 def send_message(message):
 	link = message.text
 	try:
+		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
 		ydl_opts = {
 			'format': 'best',
 			'outtmpl': os.path.join(DOWNLOAD_FOLDER, '%(title)s.%(ext)s'),
@@ -37,7 +38,8 @@ def send_message(message):
 			info_dict = ydl.extract_info(youtube_url, download=True)
 			video_title = info_dict.get('title', 'video')
 			file_path = os.path.join('videos', f"{video_title}.mp4")
-		
+			
+		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][3])
 		# Send the video file to the user
 		with open(file_path, 'rb') as video:
 			bot.send_video(message.chat.id, video)
