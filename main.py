@@ -29,7 +29,7 @@ def send_message(message):
 	try:
 		statuss = bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
 		ydl_opts = {
-			'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best',
+			'format': 'bestvideo+bestaudio/best',
 			'outtmpl': '%(title)s.%(ext)s',
 		}
 		with yt_dlp.YoutubeDL(ydl_opts) as ydl:
