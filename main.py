@@ -13,8 +13,6 @@ bot = telebot.TeleBot('6203380442:AAHM9BZtZFsSlomzxhLQ0E3DTaMQ1KDDhy0')
 with open("lang.json", "r", encoding="utf-8") as file:
 	lng = json.load(file)
 
-os.makedirs('videos', exist_ok=True)
-
 # commands
 @bot.message_handler(commands=['start'])
 def welcome(message):
@@ -32,12 +30,12 @@ def send_message(message):
 		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
 		ydl_opts = {
 			'format': 'best',
-			'outtmpl': os.path.join('videos', '%(title)s.%(ext)s'),
+			'outtmpl': '%(title)s.%(ext)s',
 		}
 		with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-			info_dict = ydl.extract_info(youtube_url, download=True)
+			info_dict = ydl.extract_info(link, download=True)
 			video_title = info_dict.get('title', 'video')
-			file_path = os.path.join('videos', f"{video_title}.mp4")
+			file_path = f"{video_title}.mp4"
 			
 		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][3])
 		# Send the video file to the user
