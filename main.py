@@ -27,25 +27,22 @@ def helpme(message):
 def send_message(message):
 	link = message.text
 	try:
-		message1 = bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
+		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
 		ydl_opts = {
 			'format': 'best',
 			'outtmpl': '%(title)s.%(ext)s',
 		}
-		print(ydl_opts)
 		with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 			info_dict = ydl.extract_info(link, download=True)
 			video_title = info_dict.get('title', 'video')
 			file_path = f"{video_title}.mp4"
 			
-		message2 = bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][3])
+		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][3])
 		# Send the video file to the user
 		with open(file_path, 'rb') as video:
-			bot.send_video(message.chat.id, video)
+			bot.send_video(message.chat.id, video, caption=lng[f'{message.from_user.language_code}'][8])
 
 		os.remove(file_path)
-		bot.delete_message(chat_id, message1)
-		bot.delete_message(chat_id, message2)
 		# yt = YouTube(link, use_oauth=True, allow_oauth_cache=True)
 		# ys = yt.streams.get_highest_resolution()
 		# if ys.filesize >= 50000000:
