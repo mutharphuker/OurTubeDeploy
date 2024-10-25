@@ -40,7 +40,7 @@ def send_message(message):
 		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][3])
 		# Send the video file to the user
 		with open(file_path, 'rb') as video:
-			bot.send_video(message.chat.id, video, caption=lng[f'{message.from_user.language_code}'][8])
+			bot.send_video(message.chat.id, video, caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
 
 		os.remove(file_path)
 		# yt = YouTube(link, use_oauth=True, allow_oauth_cache=True)
