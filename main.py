@@ -32,7 +32,7 @@ def send_message(message):
 		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
 		ydl_opts = {
 			'format': 'best',
-			'outtmpl': os.path.join(DOWNLOAD_FOLDER, '%(title)s.%(ext)s'),
+			'outtmpl': os.path.join('videos', '%(title)s.%(ext)s'),
 		}
 		with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 			info_dict = ydl.extract_info(youtube_url, download=True)
