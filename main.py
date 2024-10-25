@@ -1,4 +1,4 @@
-from pytubefix import *
+import yt_dlp
 import telebot
 from telebot import types
 import requests
@@ -12,6 +12,8 @@ bot = telebot.TeleBot('6203380442:AAHM9BZtZFsSlomzxhLQ0E3DTaMQ1KDDhy0')
 # language
 with open("lang.json", "r", encoding="utf-8") as file:
 	lng = json.load(file)
+
+os.makedirs('videos', exist_ok=True)
 
 # commands
 @bot.message_handler(commands=['start'])
@@ -27,16 +29,30 @@ def helpme(message):
 def send_message(message):
 	link = message.text
 	try:
-		yt = YouTube(link, use_oauth=True, allow_oauth_cache=True)
-		ys = yt.streams.get_highest_resolution()
-		if ys.filesize >= 50000000:
-			bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][1])
-		else:
-			bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
-			path = ys.download('videos/')
-			bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][3])
-			bot.send_video(message.chat.id, video=open(path, "rb"), supports_streaming=True)
-			os.remove(path)
+		ydl_opts = {
+			'format': 'best',
+			'outtmpl': os.path.join(DOWNLOAD_FOLDER, '%(title)s.%(ext)s'),
+		}
+		with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+			info_dict = ydl.extract_info(youtube_url, download=True)
+			video_title = info_dict.get('title', 'video')
+			file_path = os.path.join('videos', f"{video_title}.mp4")
+		
+		# Send the video file to the user
+		with open(file_path, 'rb') as video:
+			bot.send_video(message.chat.id, video)
+
+		os.remove(file_path)
+		# yt = YouTube(link, use_oauth=True, allow_oauth_cache=True)
+		# ys = yt.streams.get_highest_resolution()
+		# if ys.filesize >= 50000000:
+		# 	bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][1])
+		# else:
+		# 	bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
+		# 	path = ys.download('videos/')
+		# 	bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][3])
+		# 	bot.send_video(message.chat.id, video=open(path, "rb"), supports_streaming=True)
+		# 	os.remove(path)
 	except exceptions.AgeRestrictedError: # type: ignore
 		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][4])
 	except exceptions.RegexMatchError: # type: ignore
