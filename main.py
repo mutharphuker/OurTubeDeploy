@@ -44,24 +44,9 @@ def send_message(message):
 
 		os.remove(file_path)
 		bot.delete_message(message.chat.id, statuss.message_id)
-		# yt = YouTube(link, use_oauth=True, allow_oauth_cache=True)
-		# ys = yt.streams.get_highest_resolution()
-		# if ys.filesize >= 50000000:
-		# 	bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][1])
-		# else:
-		# 	bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
-		# 	path = ys.download('videos/')
-		# 	bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][3])
-		# 	bot.send_video(message.chat.id, video=open(path, "rb"), supports_streaming=True)
-		# 	os.remove(path)
-	except exceptions.AgeRestrictedError: # type: ignore
-		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][4])
-	except exceptions.RegexMatchError: # type: ignore
-		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][6])
 	except Exception as e:
 		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][5])
-		print("ERROR should be below:")
-		print(repr(e))
+		print("ERROR: " + repr(str(e)))
 		
 print("Bot is running...")
 bot.polling(none_stop=True)
