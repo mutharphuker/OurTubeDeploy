@@ -42,7 +42,7 @@ def send_message(message):
 				'cookiefile': 'cookies.txt',
 			}
 			with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-				info = ydl.extract_info(url, download=False)
+				info = ydl.extract_info(link, download=False)
 				filesize = info.get('filesize_approx') or info.get('filesize')
 				if filesize and filesize > 50 * 1024 * 1024:
 					bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][1])
