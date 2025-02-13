@@ -29,7 +29,6 @@ def is_valid_url(url):
         if extractor.suitable(url) and extractor.IE_NAME != 'generic':
             return True
     return False
-
 # download & send	
 @bot.message_handler(content_types=['text'])
 def send_message(message):
@@ -38,22 +37,24 @@ def send_message(message):
 		if is_valid_url(link):
 			statuss = bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
 			ydl_opts = {
-				'format': 'best', #bestvideo+bestaudio/best
+				'format': 'bestvideo+bestaudio/best',
 				'outtmpl': '%(title)s.%(ext)s',
 				'cookiefile': 'cookies.txt',
 			}
 			with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-				if ydl.extract_info(link, 'duration') <= 300000:
+				info = ydl.extract_info(url, download=False)
+				filesize = info.get('filesize_approx') or info.get('filesize')
+				if filesize and filesize > 50 * 1024 * 1024:
+					bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][1])
+				else:
 					info_dict = ydl.extract_info(link, download=True)
 					video_title = info_dict.get('title', 'video')
 					file_path = f"{video_title}.mp4"
-				else:
-					bot.send_message(message.chat.id, f'Video is too big')
 				
 			bot.edit_message_text(lng[f'{message.from_user.language_code}'][3], chat_id=message.chat.id, message_id=statuss.message_id)
+			bot.send_document(chat_id, open(file_path, 'rb'), caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
 			# with open(file_path, 'rb') as video:
 			# 	bot.send_video(message.chat.id, video, caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
-			bot.send_document(chat_id, open(file_path, 'rb'), caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
 
 			os.remove(file_path)
 			bot.delete_message(message.chat.id, statuss.message_id)
