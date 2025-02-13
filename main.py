@@ -57,6 +57,7 @@ def send_message(message):
 				
 			bot.edit_message_text(lng[f'{message.from_user.language_code}'][3], chat_id=message.chat.id, message_id=statuss.message_id)
 			def send_video():
+				global file_path
 				bot.send_document(message.chat.id, open(file_path, 'rb'), caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
 			thread2 = threading.Thread(target=send_video)
 			thread2.start()
