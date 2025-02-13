@@ -52,7 +52,7 @@ def send_message(message):
 					file_path = f"{video_title}.mp4"
 				
 			bot.edit_message_text(lng[f'{message.from_user.language_code}'][3], chat_id=message.chat.id, message_id=statuss.message_id)
-			bot.send_document(chat_id, open(file_path, 'rb'), caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
+			bot.send_document(message.chat.id, open(file_path, 'rb'), caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
 			# with open(file_path, 'rb') as video:
 			# 	bot.send_video(message.chat.id, video, caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
 
