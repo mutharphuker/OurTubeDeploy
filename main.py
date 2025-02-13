@@ -49,6 +49,7 @@ def send_message(message):
 					bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][1])
 				else:
 					def download_video():
+						global file_path
 						info_dict = ydl.extract_info(link, download=True)
 						video_title = info_dict.get('title', 'video')
 						file_path = f"{video_title}.mp4"
