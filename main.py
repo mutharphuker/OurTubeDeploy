@@ -33,9 +33,12 @@ def send_message(message):
 			'outtmpl': '%(title)s.%(ext)s',
 		}
 		with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-			info_dict = ydl.extract_info(link, download=True)
-			video_title = info_dict.get('title', 'video')
-			file_path = f"{video_title}.mp4"
+			if ydl.extract_info(link, 'duration') <= 300000:
+				info_dict = ydl.extract_info(link, download=True)
+				video_title = info_dict.get('title', 'video')
+				file_path = f"{video_title}.mp4"
+			else:
+				bot.send_message(message.chat.id, f'Video is too big')
 			
 		bot.edit_message_text(lng[f'{message.from_user.language_code}'][3], chat_id=message.chat.id, message_id=statuss.message_id)
 		with open(file_path, 'rb') as video:
@@ -44,8 +47,11 @@ def send_message(message):
 		os.remove(file_path)
 		bot.delete_message(message.chat.id, statuss.message_id)
 	except Exception as e:
-		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][5])
 		print("ERROR: " + repr(str(e)))
+		if "not a valid URL" in str(e):
+			bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][6])
+		else:
+			bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][5])
 		
 print("Bot is running...")
 bot.polling(none_stop=True)
