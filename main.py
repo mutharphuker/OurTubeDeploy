@@ -1,6 +1,7 @@
 import yt_dlp
 import telebot
 from telebot import types
+import threading
 import requests
 import json
 import sys
@@ -47,14 +48,18 @@ def send_message(message):
 				if filesize and filesize > 50 * 1024 * 1024:
 					bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][1])
 				else:
-					info_dict = ydl.extract_info(link, download=True)
-					video_title = info_dict.get('title', 'video')
-					file_path = f"{video_title}.mp4"
+					def download_video():
+						info_dict = ydl.extract_info(link, download=True)
+						video_title = info_dict.get('title', 'video')
+						file_path = f"{video_title}.mp4"
+					thread = threading.Thread(target=download_video)
+					thread.start()
 				
 			bot.edit_message_text(lng[f'{message.from_user.language_code}'][3], chat_id=message.chat.id, message_id=statuss.message_id)
-			bot.send_document(message.chat.id, open(file_path, 'rb'), caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
-			# with open(file_path, 'rb') as video:
-			# 	bot.send_video(message.chat.id, video, caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
+			def send_video():
+				bot.send_document(message.chat.id, open(file_path, 'rb'), caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
+			thread2 = threading.Thread(target=send_video)
+			thread2.start()
 
 			os.remove(file_path)
 			bot.delete_message(message.chat.id, statuss.message_id)
