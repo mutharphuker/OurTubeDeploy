@@ -37,9 +37,9 @@ def send_message(message):
 		if is_valid_url(link):
 			statuss = bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
 			ydl_opts = {
-				'format': 'bestvideo+bestaudio/best',
+				'format': 'best',
 				'outtmpl': '%(title)s.%(ext)s',
-				# 'cookiefile': 'cookies.txt',
+				'cookiefile': 'cookies.txt',
 			}
 			with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 				info = ydl.extract_info(link, download=False)
