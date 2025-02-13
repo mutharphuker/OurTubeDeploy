@@ -39,7 +39,7 @@ def send_message(message):
 			ydl_opts = {
 				'format': 'bestvideo+bestaudio/best',
 				'outtmpl': '%(title)s.%(ext)s',
-				'cookiefile': 'cookies.txt',
+				# 'cookiefile': 'cookies.txt',
 			}
 			with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 				info = ydl.extract_info(link, download=False)
