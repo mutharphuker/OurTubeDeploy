@@ -38,8 +38,9 @@ def send_message(message):
 		if is_valid_url(link):
 			statuss = bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
 			ydl_opts = {
-				'format': 'best',
+				'format': 'best', #bestvideo+bestaudio/best
 				'outtmpl': '%(title)s.%(ext)s',
+				'cookiefile': 'cookies.txt',
 			}
 			with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 				if ydl.extract_info(link, 'duration') <= 300000:
@@ -50,8 +51,9 @@ def send_message(message):
 					bot.send_message(message.chat.id, f'Video is too big')
 				
 			bot.edit_message_text(lng[f'{message.from_user.language_code}'][3], chat_id=message.chat.id, message_id=statuss.message_id)
-			with open(file_path, 'rb') as video:
-				bot.send_video(message.chat.id, video, caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
+			# with open(file_path, 'rb') as video:
+			# 	bot.send_video(message.chat.id, video, caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
+			bot.send_document(chat_id, open(file_path, 'rb'), caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
 
 			os.remove(file_path)
 			bot.delete_message(message.chat.id, statuss.message_id)
