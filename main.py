@@ -1,15 +1,13 @@
+from aiogram import Bot, Dispatcher, executor, types
+from aiogram.types import Message
 import yt_dlp
 import asyncio
 import aiofiles
 import json
 import os
-from aiogram import Bot, Dispatcher, types
-from aiogram.types import Message
-from aiogram.filters import Command
 
-API_TOKEN = '6203380442:AAHMZtZFsSlomzxhLQ0E3DTaMQ1KDDhy0'
-bot = Bot(token=API_TOKEN)
-dp = Dispatcher()
+bot = Bot(token='6203380442:AAHMZtZFsSlomzxhLQ0E3DTaMQ1KDDhy0')
+dp = Dispatcher(bot)
 
 # Load language file
 with open("lang.json", "r", encoding="utf-8") as file:
@@ -24,12 +22,12 @@ def is_valid_url(url):
     return False
 
 # Start command
-@dp.message(Command['start'])
+@dp.message_handler(commands=['start'])
 async def welcome(message: Message):
     await message.answer(lng.get(f'{message.from_user.language_code}', ["Welcome"])[0])
 
 # Help command
-@dp.message(Command['help'])
+@dp.message_handler(commands=['help'])
 async def helpme(message: Message):
     await message.answer(lng.get(f'{message.from_user.language_code}', ["Help"])[7], parse_mode='html', disable_web_page_preview=True)
 
