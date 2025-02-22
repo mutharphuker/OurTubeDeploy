@@ -5,6 +5,7 @@ import json
 import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message
+from aiogram.filters import Command
 
 API_TOKEN = '6203380442:AAHMZtZFsSlomzxhLQ0E3DTaMQ1KDDhy0'
 bot = Bot(token=API_TOKEN)
@@ -23,12 +24,12 @@ def is_valid_url(url):
     return False
 
 # Start command
-@dp.message_handler(commands=['start'])
+@dp.message(Command['start'])
 async def welcome(message: Message):
     await message.answer(lng.get(f'{message.from_user.language_code}', ["Welcome"])[0])
 
 # Help command
-@dp.message_handler(commands=['help'])
+@dp.message(Command['help'])
 async def helpme(message: Message):
     await message.answer(lng.get(f'{message.from_user.language_code}', ["Help"])[7], parse_mode='html', disable_web_page_preview=True)
 
