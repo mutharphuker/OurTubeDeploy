@@ -49,21 +49,20 @@ def send_message(message):
 					bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][1])
 				else:
 					def download_video():
-						global file_path
 						info_dict = ydl.extract_info(link, download=True)
 						video_title = info_dict.get('title', 'video')
 						file_path = f"{video_title}.mp4"
 					thread = threading.Thread(target=download_video)
 					thread.start()
 				
-			bot.edit_message_text(lng[f'{message.from_user.language_code}'][3], chat_id=message.chat.id, message_id=statuss.message_id)
-			def send_video(path):
-				bot.send_document(message.chat.id, open(path, 'rb'), caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
-			thread2 = threading.Thread(target=send_video(file_path))
-			thread2.start()
+					bot.edit_message_text(lng[f'{message.from_user.language_code}'][3], chat_id=message.chat.id, message_id=statuss.message_id)
+					def send_video(path):
+						bot.send_document(message.chat.id, open(path, 'rb'), caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
+					thread2 = threading.Thread(target=send_video(file_path))
+					thread2.start()
 
-			os.remove(file_path)
-			bot.delete_message(message.chat.id, statuss.message_id)
+					os.remove(file_path)
+					bot.delete_message(message.chat.id, statuss.message_id)
 		else:
 			bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][6])
 	except Exception as e:
