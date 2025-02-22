@@ -8,7 +8,7 @@ from aiogram.types import Message
 
 API_TOKEN = '6203380442:AAHMZtZFsSlomzxhLQ0E3DTaMQ1KDDhy0'
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
 # Load language file
 with open("lang.json", "r", encoding="utf-8") as file:
