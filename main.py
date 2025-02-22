@@ -5,7 +5,6 @@ import json
 import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message
-from aiogram.utils import executor
 
 API_TOKEN = '6203380442:AAHMZtZFsSlomzxhLQ0E3DTaMQ1KDDhy0'
 bot = Bot(token=API_TOKEN)
@@ -73,6 +72,8 @@ async def send_message(message: Message):
         print("ERROR:", e)
         await message.answer(lng.get(f'{message.from_user.language_code}', ["Error occurred"])[5])
 
+async def main():
+    await dp.start_polling(bot)
+
 if __name__ == "__main__":
-    print("Bot is running...")
-    executor.start_polling(dp, skip_updates=True)
+    asyncio.run(main())
