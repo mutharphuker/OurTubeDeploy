@@ -33,38 +33,43 @@ def is_valid_url(url):
 # download & send	
 @bot.message_handler(content_types=['text'])
 def send_message(message):
-	link = message.text
-	try:
-		if is_valid_url(link):
-			statuss = bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
-			ydl_opts = {
-				'format': 'best',
-				'outtmpl': '%(title)s.%(ext)s',
-				'cookiefile': 'cookies.txt',
-			}
-			with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-				info = ydl.extract_info(link, download=False)
-				filesize = info.get('filesize_approx') or info.get('filesize')
-				if filesize and filesize > 50 * 1024 * 1024:
-					bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][1])
-				else:
-					info_dict = ydl.extract_info(link, download=True)
-					video_title = info_dict.get('title', 'video')
-					file_path = f"{video_title}.mp4"
-				
-			bot.edit_message_text(lng[f'{message.from_user.language_code}'][3], chat_id=message.chat.id, message_id=statuss.message_id)
-			def send_video(path):
-				bot.send_document(message.chat.id, open(path, 'rb'), caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
-			thread2 = threading.Thread(target=send_video(file_path))
-			thread2.start()
-
-			os.remove(file_path)
-			bot.delete_message(message.chat.id, statuss.message_id)
-		else:
-			bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][6])
-	except Exception as e:
-		print("ERROR: " + repr(str(e)))
-		bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][5])
+    link = message.text
+    try:
+        if is_valid_url(link):
+            statuss = bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][2])
+            
+            ydl_opts = {
+                'format': 'best',
+                'outtmpl': '%(title)s.%(ext)s',
+                'cookiefile': 'cookies.txt'
+            }
+            
+            def download_video():
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    info = ydl.extract_info(link, download=False)
+                    filesize = info.get('filesize_approx') or info.get('filesize')
+                    if filesize and filesize > 50 * 1024 * 1024:
+                        bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][1])
+                    else:
+                        info_dict = ydl.extract_info(link, download=True)
+                        video_title = info_dict.get('title', 'video')
+                        file_path = f"{video_title}.mp4"
+                        
+                        bot.edit_message_text(lng[f'{message.from_user.language_code}'][3], chat_id=message.chat.id, message_id=statuss.message_id)
+                        
+                        def send_video():
+                            bot.send_document(message.chat.id, open(file_path, 'rb'), caption=lng[f'{message.from_user.language_code}'][8], parse_mode='html')
+                            os.remove(file_path)
+                            bot.delete_message(message.chat.id, statuss.message_id)
+                        
+                        threading.Thread(target=send_video).start()
+            
+            threading.Thread(target=download_video).start()
+        else:
+            bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][6])
+    except Exception as e:
+        print("ERROR: " + repr(str(e)))
+        bot.send_message(message.chat.id, lng[f'{message.from_user.language_code}'][5])
 		
 print("Bot is running...")
 bot.polling(none_stop=True)
