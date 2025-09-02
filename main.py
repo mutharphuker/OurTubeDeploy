@@ -3,16 +3,15 @@ import os
 import asyncio
 import re
 import tempfile
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
 from aiogram.types import Message
-from aiogram.exceptions import TelegramBadRequest
 from yt_dlp import YoutubeDL
 
 # Put your bot token directly here
 BOT_TOKEN = "6203380442:AAHMZtZFsSlomzxhLQ0E3DTaMQ1KDDhy0"
 
-# Initialize bot
+# Initialize bot and dispatcher
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
@@ -59,8 +58,6 @@ async def handle_message(message: Message):
             with open(file_path, "rb") as video:
                 await message.answer_video(video)
 
-    except TelegramBadRequest:
-        await message.answer("⚠️ Failed to upload video (possibly too large).")
     except Exception as e:
         await message.answer(f"❌ Error: {str(e)}")
 
