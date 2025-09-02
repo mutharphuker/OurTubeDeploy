@@ -9,7 +9,7 @@ from aiogram.types import Message
 from yt_dlp import YoutubeDL
 
 # Put your bot token directly here
-BOT_TOKEN = "6203380442:AAHMZtZFsSlomzxhLQ0E3DTaMQ1KDDhy0"
+BOT_TOKEN = "6203380442:AAHM9BZtZFsSlomzxhLQ0E3DTaMQ1KDDhy0"
 
 # Initialize bot and dispatcher
 bot = Bot(token=BOT_TOKEN)
