@@ -1,75 +1,78 @@
-# file: bot.py
-import os
-import asyncio
-import re
-import tempfile
-from aiogram import Bot, Dispatcher, types
-from aiogram.filters import CommandStart
+from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import Message
-from aiogram.exceptions import TelegramBadRequest
-from yt_dlp import YoutubeDL
-from dotenv import load_dotenv
+import yt_dlp
+import asyncio
+import aiofiles
+import json
+import os
 
-# Load environment variables
-load_dotenv()
-BOT_TOKEN = os.getenv("6203380442:AAHMZtZFsSlomzxhLQ0E3DTaMQ1KDDhy0")
+bot = Bot(token='6203380442:AAHMZtZFsSlomzxhLQ0E3DTaMQ1KDDhy0')
+dp = Dispatcher(bot)
 
-# Initialize bot
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher()
+# Load language file
+with open("lang.json", "r", encoding="utf-8") as file:
+    lng = json.load(file)
 
-# Regex for YouTube links
-YOUTUBE_REGEX = re.compile(r"^(https?://)?(www\.)?(youtube\.com|youtu\.?be)/.+$")
+# Link validation
+def is_valid_url(url):
+    extractors = yt_dlp.extractor.gen_extractors()
+    for extractor in extractors:
+        if extractor.suitable(url) and extractor.IE_NAME != 'generic':
+            return True
+    return False
 
+# Start command
+@dp.message_handler(commands=['start'])
+async def welcome(message: Message):
+    await message.answer(lng.get(f'{message.from_user.language_code}', ["Welcome"])[0])
 
-def download_video(url: str, output_dir: str) -> str:
-    """Download YouTube video in best quality using yt-dlp."""
-    ydl_opts = {
-        "format": "bestvideo+bestaudio/best",
-        "merge_output_format": "mp4",
-        "outtmpl": os.path.join(output_dir, "%(title)s.%(ext)s"),
-    }
-    with YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        return ydl.prepare_filename(info)
+# Help command
+@dp.message_handler(commands=['help'])
+async def helpme(message: Message):
+    await message.answer(lng.get(f'{message.from_user.language_code}', ["Help"])[7], parse_mode='html', disable_web_page_preview=True)
 
-
-@dp.message(CommandStart())
-async def start_cmd(message: Message):
-    await message.answer("👋 Send me a YouTube link and I'll download the video in best quality for you.")
-
-
-@dp.message()
-async def handle_message(message: Message):
-    url = message.text.strip()
-
-    if not YOUTUBE_REGEX.match(url):
-        await message.answer("❌ Please send a valid YouTube link.")
+# Download & send
+@dp.message_handler(content_types=['text'])
+async def send_message(message: Message):
+    link = message.text
+    if not is_valid_url(link):
+        await message.answer(lng.get(f'{message.from_user.language_code}', ["Invalid URL"])[6])
         return
-
-    await message.answer("⏳ Downloading your video, please wait...")
-
+    
+    statuss = await message.answer(lng.get(f'{message.from_user.language_code}', ["Downloading..."])[2])
+    
+    ydl_opts = {
+        'format': 'best',
+        'outtmpl': '%(title)s.%(ext)s',
+        'cookiefile': 'cookies.txt'
+    }
+    
     try:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            file_path = download_video(url, tmpdir)
-
-            file_size = os.path.getsize(file_path)
-            if file_size > 2 * 1024 * 1024 * 1024:  # 2GB limit
-                await message.answer("⚠️ Video is too large to upload (Telegram limit is 2GB).")
-                return
-
-            with open(file_path, "rb") as video:
-                await message.answer_video(video)
-
-    except TelegramBadRequest:
-        await message.answer("⚠️ Failed to upload video (possibly too large).")
+        async with asyncio.Lock():
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(link, download=False)
+                filesize = info.get('filesize_approx') or info.get('filesize')
+                if filesize and filesize > 50 * 1024 * 1024:
+                    await message.answer(lng.get(f'{message.from_user.language_code}', ["File too large"])[1])
+                    return
+                
+                info_dict = ydl.extract_info(link, download=True)
+                video_title = info_dict.get('title', 'video')
+                file_path = f"{video_title}.mp4"
+                
+                await bot.edit_message_text(lng.get(f'{message.from_user.language_code}', ["Uploading..."])[3], chat_id=message.chat.id, message_id=statuss.message_id)
+                
+                async with aiofiles.open(file_path, 'rb') as file:
+                    await bot.send_document(message.chat.id, file, caption=lng.get(f'{message.from_user.language_code}', ["Here is your video"])[8], parse_mode='html')
+                
+                os.remove(file_path)
+                await bot.delete_message(message.chat.id, statuss.message_id)
     except Exception as e:
-        await message.answer(f"❌ Error: {str(e)}")
-
+        print("ERROR:", e)
+        await message.answer(lng.get(f'{message.from_user.language_code}', ["Error occurred"])[5])
 
 async def main():
     await dp.start_polling(bot)
-
 
 if __name__ == "__main__":
     asyncio.run(main())
